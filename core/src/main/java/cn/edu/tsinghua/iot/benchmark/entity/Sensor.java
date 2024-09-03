@@ -92,7 +92,7 @@ public class Sensor {
     Sensor result = new Sensor();
     result.name = ReadWriteIOUtils.readString(inputStream);
     result.sensorType = SensorType.getType(ReadWriteIOUtils.readInt(inputStream));
-    result.columnCategory = ColumnCategory.getType(ReadWriteIOUtils.readInt(inputStream));
+    result.columnCategory = ColumnCategory.values()[ReadWriteIOUtils.readInt(inputStream)];
     return result;
   }
 

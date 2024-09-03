@@ -29,14 +29,4 @@ public enum ColumnCategory {
   ColumnCategory(String name) {
     this.name = name;
   }
-
-  public static ColumnCategory getType(int ordinal) {
-    for (ColumnCategory columnCategory : ColumnCategory.values()) {
-      if (columnCategory.ordinal() == ordinal) {
-        return columnCategory;
-      }
-    }
-    // default type
-    return ColumnCategory.MEASUREMENT;
-  }
 }
