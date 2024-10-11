@@ -613,9 +613,10 @@ public class ConfigDescriptor {
         break;
     }
     if ((config.getIoTDB_DIALECT_MODE() == SQLDialect.TABLE
-        && config.getDbConfig().getDB_SWITCH().getInsertMode() != INSERT_USE_SESSION_TABLET)) {
+        && config.getDbConfig().getDB_SWITCH().getInsertMode() != INSERT_USE_SESSION_TABLET
+        && config.getDbConfig().getDB_SWITCH().getType() != DBType.SelfCheck)) {
       LOGGER.error(
-          "The iotdb table model only supports INSERT_USE_SESSION_TABLET! Please modify DB_SWITCH in the configuration file.");
+          "The iotdb table model only supports INSERT_USE_SESSION_TABLET ! Please modify DB_SWITCH in the configuration file.");
       result = false;
     }
     result &= checkInsertDataTypeProportion();

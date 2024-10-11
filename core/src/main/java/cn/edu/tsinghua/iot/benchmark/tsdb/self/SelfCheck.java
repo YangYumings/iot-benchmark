@@ -66,23 +66,33 @@ public class SelfCheck implements IDatabase {
   @Override
   public Status insertOneBatch(IBatch batch) {
     String deviceName = batch.getDeviceSchema().getDevice();
-    long maxTime = deviceNameToMaxTime.getOrDefault(deviceName, 0L);
-    long totalPoint = deviceNameToTotalPoints.getOrDefault(deviceName, 0L);
-    long outOfOrderPoint = deviceNameToOutOfOrderPoints.getOrDefault(deviceName, 0L);
-    for (Record record : batch.getRecords()) {
-      long point = record.getRecordDataValue().size();
-      totalPoint += point;
-      if (record.getTimestamp() >= maxTime) {
-        // in order
-        maxTime = record.getTimestamp();
-      } else {
-        // out of order
-        outOfOrderPoint += record.getRecordDataValue().size();
+    long maxTime;
+    long totalPoint;
+    long outOfOrderPoint;
+    while (true) {
+      deviceName = batch.getDeviceSchema().getDevice();
+      maxTime = deviceNameToMaxTime.getOrDefault(deviceName, 0L);
+      totalPoint = deviceNameToTotalPoints.getOrDefault(deviceName, 0L);
+      outOfOrderPoint = deviceNameToOutOfOrderPoints.getOrDefault(deviceName, 0L);
+      for (Record record : batch.getRecords()) {
+        long point = record.getRecordDataValue().size();
+        totalPoint += point;
+        if (record.getTimestamp() >= maxTime) {
+          // in order
+          maxTime = record.getTimestamp();
+        } else {
+          // out of order
+          outOfOrderPoint += record.getRecordDataValue().size();
+        }
       }
+      deviceNameToMaxTime.put(deviceName, maxTime);
+      deviceNameToTotalPoints.put(deviceName, totalPoint);
+      deviceNameToOutOfOrderPoints.put(deviceName, outOfOrderPoint);
+      if (!batch.hasNext()) {
+        break;
+      }
+      batch.next();
     }
-    deviceNameToMaxTime.put(deviceName, maxTime);
-    deviceNameToTotalPoints.put(deviceName, totalPoint);
-    deviceNameToOutOfOrderPoints.put(deviceName, outOfOrderPoint);
     return check(new Status(true));
   }
 
